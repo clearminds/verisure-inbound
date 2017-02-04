@@ -1,0 +1,9 @@
+Unidecode==0.04.20
+Flask==0.10.1
+vsure==1.1.0
+PyYAML==3.11
+configparser==3.5.0
+python-http-client==2.2.1
+paho-mqtt==1.2
+Werkzeug==0.11.15
+six==1.10.0
