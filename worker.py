@@ -56,7 +56,7 @@ def process_overview():
         else:
             domoticz_publish('{"idx":%s,"command":"switchlight","switchcmd":"Off"}' % (os.environ['DOMOTICZ_IDX_DOOR']))
 
-    print "Current armState: %s - %s, Current doorState: %s" % (armState, armStatus['statusType'], doorState)
+    print("Current armState: %s - %s, Current doorState: %s" % (armState, armStatus['statusType'], doorState))
     with open('.cache.cfg', 'w') as configfile:
         config.write(configfile)
 
@@ -73,8 +73,8 @@ def on_connect(client, userdata, rc):
 def on_message(client, userdata, msg):
     print(msg.topic+" "+str(msg.payload))
     process_overview()
-    if msg.payload.startswith('doorman/'):
-        print "os.execute()"
+    if msg.payload.startswith(b'doorman/'):
+        pass
 
 client = mqtt.Client()
 client.on_connect = on_connect
