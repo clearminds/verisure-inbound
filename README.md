@@ -22,6 +22,7 @@ Solution to trigger actions on different incoming emails from Verisure
     MQTT_USERNAME:           Username to MQTT Server
     VERISURE_EMAIL:          Verisure Login
     VERISURE_PASSWORD:       Verisure Password
+    VERISURE_CRON_INTERVAL:  Interval to Poll Verisure in seconds (default: 60)
 
 ###Screenshots
 ![Domoticz Devices](docs/domoticz_devices.png)

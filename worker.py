@@ -12,10 +12,13 @@ session = verisure.Session(os.environ['VERISURE_EMAIL'], os.environ['VERISURE_PA
 session.login()
 
 import paho.mqtt.client as mqtt
+
+connection_times = 0
+
 def domoticz_publish(message):
     client.publish("domoticz/in", message)
 
-def process_overview():
+def process_overview(message):
     try:
         overview = session.get_overview()
     except:
@@ -56,7 +59,9 @@ def process_overview():
         else:
             domoticz_publish('{"idx":%s,"command":"switchlight","switchcmd":"Off"}' % (os.environ['DOMOTICZ_IDX_DOOR']))
 
-    print("Current armState: %s - %s, Current doorState: %s" % (armState, armStatus['statusType'], doorState))
+    if message != b'cron':
+        print("Message: %s, Current armState: %s - %s, Current doorState: %s" % (message, armState, armStatus['statusType'], doorState))
+
     with open('.cache.cfg', 'w') as configfile:
         config.write(configfile)
 
@@ -64,17 +69,16 @@ def process_overview():
 
 # The callback for when the client receives a CONNACK response from the server.
 def on_connect(client, userdata, rc):
-    print("Connected - Starting to process data")
+    global connection_times
+    connection_times += 1
+    print("Connected - Starting to process data. Connection Attempt: %s" % connection_times)
     # Subscribing in on_connect() means that if we lose the connection and
     # reconnect then subscriptions will be renewed.
     client.subscribe("verisure")
 
 # The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
-    print(msg.topic+" "+str(msg.payload))
-    process_overview()
-    if msg.payload.startswith(b'doorman/'):
-        pass
+    process_overview(msg.payload)
 
 client = mqtt.Client()
 client.on_connect = on_connect

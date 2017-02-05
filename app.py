@@ -15,7 +15,6 @@ import paho.mqtt.publish as publish
 
 def mqtt_publish(dest, msg):
     publish.single(dest, msg, hostname=os.environ['MQTT_HOST'], auth={'username': os.environ['MQTT_USERNAME'], 'password': os.environ['MQTT_PASSWORD']})
-    print(dest, msg)
 
 @app.route('/ping', methods=['GET'])
 def ping():
@@ -43,6 +42,10 @@ def inbound_parse():
         mqtt_publish("verisure", 'doorman/unlock/outside')
     elif subject == 'upplast inifran':
         mqtt_publish("verisure", 'doorman/unlock/inside')
+    elif subject == 'last inifran':
+        mqtt_publish("verisure", 'doorman/lock/inside')
+    elif subject == 'last utifran':
+        mqtt_publish("verisure", 'doorman/lock/inside')
     elif subject == 'upplast':
         mqtt_publish("verisure", 'doorman/unlock/remote')
     elif subject == u'misslyckad lasning':
