@@ -13,17 +13,21 @@ config = Config()
 
 import paho.mqtt.publish as publish
 
+
 def mqtt_publish(dest, msg):
-    publish.single(dest, msg, hostname=os.environ['MQTT_HOST'], auth={'username': os.environ['MQTT_USERNAME'], 'password': os.environ['MQTT_PASSWORD']})
+    publish.single(dest, msg, hostname=os.environ['MQTT_HOST'],
+                   auth={'username': os.environ['MQTT_USERNAME'],
+                         'password': os.environ['MQTT_PASSWORD']})
+
 
 @app.route('/ping', methods=['GET'])
 def ping():
     return "Pong!"
 
+
 @app.route(config.endpoint, methods=['POST'])
 def inbound_parse():
     parse = Parse(config, request)
-    # Sample proccessing action
     to = parse.key_values().get('to')
     dkim = parse.key_values().get('dkim')
     sender = parse.key_values().get('from')
@@ -35,23 +39,23 @@ def inbound_parse():
         print ('DKIM: ', dkim)
         return "OK"
     if subject == 'larmat':
-        mqtt_publish("verisure", 'alarm/on')
+        mqtt_publish('verisure', 'alarm/on')
     elif subject == 'avlarmat':
-        mqtt_publish("verisure", 'alarm/off')
+        mqtt_publish('verisure', 'alarm/off')
     elif subject == 'upplast utifran':
-        mqtt_publish("verisure", 'doorman/unlock/outside')
+        mqtt_publish('verisure', 'doorman/unlock/outside')
     elif subject == 'upplast inifran':
-        mqtt_publish("verisure", 'doorman/unlock/inside')
+        mqtt_publish('verisure', 'doorman/unlock/inside')
     elif subject == 'last inifran':
-        mqtt_publish("verisure", 'doorman/lock/inside')
+        mqtt_publish('verisure', 'doorman/lock/inside')
     elif subject == 'last utifran':
-        mqtt_publish("verisure", 'doorman/lock/inside')
+        mqtt_publish('verisure', 'doorman/lock/inside')
     elif subject == 'upplast':
-        mqtt_publish("verisure", 'doorman/unlock/remote')
+        mqtt_publish('verisure', 'doorman/unlock/remote')
     elif subject == u'misslyckad lasning':
-        mqtt_publish("verisure", 'doorman/lock/fail')
+        mqtt_publish('verisure', 'doorman/lock/fail')
     else:
-        mqtt_publish("verisure", u'unknown/'+subject)
+        mqtt_publish('verisure', 'unknown/'+subject)
     # Tell SendGrid's Inbound Parse to stop sending POSTs
     # Everything is 200 OK :)
     return "OK"

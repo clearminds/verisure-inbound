@@ -7,7 +7,6 @@ config.read('.cache.cfg')
 if not 'verisure' in config.sections():
     config.add_section('verisure')
 
-
 session = verisure.Session(os.environ['VERISURE_EMAIL'], os.environ['VERISURE_PASSWORD'])
 session.login()
 
@@ -15,8 +14,10 @@ import paho.mqtt.client as mqtt
 
 connection_times = 0
 
+
 def domoticz_publish(message):
-    client.publish("domoticz/in", message)
+    client.publish('domoticz/in', message)
+
 
 def process_overview(message):
     try:
@@ -60,23 +61,20 @@ def process_overview(message):
             domoticz_publish('{"idx":%s,"command":"switchlight","switchcmd":"Off"}' % (os.environ['DOMOTICZ_IDX_DOOR']))
 
     if message != b'cron':
-        print("Message: %s, Current armState: %s - %s, Current doorState: %s" % (message, armState, armStatus['statusType'], doorState))
+        print('Message: %s, Current armState: %s - %s, Current doorState: %s' % (message, armState, armStatus['statusType'], doorState))
 
     with open('.cache.cfg', 'w') as configfile:
         config.write(configfile)
 
     return True
 
-# The callback for when the client receives a CONNACK response from the server.
+
 def on_connect(client, userdata, rc):
     global connection_times
     connection_times += 1
-    print("Connected - Starting to process data. Connection Attempt: %s" % connection_times)
-    # Subscribing in on_connect() means that if we lose the connection and
-    # reconnect then subscriptions will be renewed.
-    client.subscribe("verisure")
+    print('Connected - Starting to process data. Connection Attempt: %s' % connection_times)
+    client.subscribe('verisure')
 
-# The callback for when a PUBLISH message is received from the server.
 def on_message(client, userdata, msg):
     process_overview(msg.payload)
 
@@ -85,12 +83,6 @@ client.on_connect = on_connect
 client.on_message = on_message
 client.username_pw_set(os.environ['MQTT_USERNAME'], password=os.environ['MQTT_PASSWORD'])
 client.connect(os.environ['MQTT_HOST'], 1883, 5)
-
-
-# Blocking call that processes network traffic, dispatches callbacks and
-# handles reconnecting.
-# Other loop*() functions are available that give a threaded interface and a
-# manual interface.
 client.loop_forever()
 
 session.logout()
